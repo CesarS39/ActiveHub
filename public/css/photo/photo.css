@@ -1,0 +1,15 @@
+.img-panel{
+    height: 350px;
+    width: 350px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.img-boton{
+    height: 50px;
+    width: 50px;
+}
+
+.no-border{
+    border: none;
+}  
