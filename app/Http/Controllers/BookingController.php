@@ -5,78 +5,86 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\User;
+use App\Models\Sport_User;
 use App\Models\TeacherSchedule;
-use App\Http\Requests\BookingStoreRequest;
-use App\Http\Requests\BookingUpdateRequest;
 
 class BookingController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $filterValue = $request->input('filterValue');
-        // Asegúrate de reemplazar 'column' con el nombre real de la columna que quieres filtrar.
-        $bookings = Booking::where('user_id', 'like', '%' . $filterValue . '%')->paginate(10);
-        
+        $bookings = Booking::with(['user', 'teacherSchedule.sport_user.user', 'teacherSchedule.sport_user.sport'])->paginate(10);
         return view('bookings.index', compact('bookings'));
     }
-    
+
     public function create()
     {
-        // Selecciona usuarios que son 'estudiantes' usando la librería spatie/laravel-permission.
-        // Asegúrate de que el ID del rol sea correcto para tus estudiantes.
-        $students = User::role('Student')->get(); // Aquí usamos el nombre del rol directamente. Ajusta según la configuración de tu sistema.
-    
-        $teacherSchedules = TeacherSchedule::with('teacher')->get();
-    
-        return view('bookings.create', compact('students', 'teacherSchedules'));
+        // Solo los profesores se muestran aquí
+        $teachers = User::role('Teacher')->get();
+        return view('bookings.create', compact('teachers'));
     }
-    
-    public function store(BookingStoreRequest $request)
+
+    public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id', // Cambia 'student_id' por 'user_id'.
-            'teacher_schedule_id' => 'required|exists:teacher_schedules,id',
-            'date' => 'required|date',
-            'schedule' => 'required',
-            'status' => 'required|in:scheduled,completed,cancelled',
+        // Este método deberá manejar la primera parte de la creación del booking
+        // donde se selecciona el profesor y luego se procede a seleccionar el deporte.
+        // La lógica de negocio real para almacenar el booking se manejará en otro método.
+    }
+
+    public function continueToSports(Request $request)
+    {
+        // Obtenemos los deportes que el profesor seleccionado puede enseñar
+        $sports = Sport_User::where('user_id', $request->teacher_id)->with('sport')->get();
+
+        // Pasamos al siguiente paso para seleccionar el deporte
+        return view('bookings.select_sport', [
+            'sports' => $sports,
+            'teacher_id' => $request->teacher_id
         ]);
-    
-        Booking::create($validatedData);
-    
-        return redirect()->route('bookings.index')->with('success-create', 'Booking created successfully.');
     }
-    
-    public function edit(Booking $booking)
+
+    public function continueToSchedules(Request $request)
     {
-        // Similar a create, selecciona usuarios con rol de 'estudiante'.
-        $students = User::role('Student')->get(); // Ajusta el método de selección de roles como sea necesario.
-    
-        $teacherSchedules = TeacherSchedule::with('teacher')->get();
-    
-        return view('bookings.edit', compact('booking', 'students', 'teacherSchedules'));
-    }
-    
-    public function update(BookingUpdateRequest $request, Booking $booking)
-    {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id', // Cambia 'student_id' por 'user_id'.
-            'teacher_schedule_id' => 'required|exists:teacher_schedules,id',
-            'date' => 'required|date',
-            'schedule' => 'required',
-            'status' => 'required|in:scheduled,completed,cancelled',
+        // Obtenemos los horarios del deporte seleccionado del profesor
+        $schedules = TeacherSchedule::where('sport_user_id', $request->sport_user_id)->get();
+
+        // Pasamos al siguiente paso para seleccionar el horario
+        return view('bookings.select_schedule', [
+            'schedules' => $schedules,
+            'sport_user_id' => $request->sport_user_id
         ]);
-    
-        $booking->update($validatedData);
-    
-        return redirect()->route('bookings.index')->with('success-update', 'Booking updated successfully.');
     }
-    
+
+    public function storeFinal(Request $request)
+    {
+    // Valida todos los campos necesarios
+    $validatedData = $request->validate([
+        'schedule_id' => 'required|exists:teacher_schedules,id',
+        'date' => 'required|date', // Asegúrate de que estés enviando este campo desde el formulario
+    ]);
+
+    // Crea la reserva con los datos validados
+    Booking::create([
+        'user_id' => auth()->user()->id,
+        'teacher_schedule_id' => $validatedData['schedule_id'],
+        'date' => $validatedData['date'],
+        'status' => 'agendada', // Puedes ajustar este valor según tus necesidades
+    ]);
+
+    // Redirecciona al índice con un mensaje de éxito
+    return redirect()->route('bookings.index')->with('success-create', 'La clase ha sido agendada correctamente.');
+    }
 
     public function destroy(Booking $booking)
     {
         $booking->delete();
-
-        return back()->with('success-delete', 'Booking deleted successfully.');
+        return redirect()->route('bookings.index')->with('success-delete', 'La clase ha sido cancelada correctamente.');
     }
+
+    public function show(Booking $booking)
+{
+    // Asegúrate de cargar todas las relaciones necesarias para mostrar los detalles
+    return view('bookings.show', compact('booking'));
 }
+}
+
 

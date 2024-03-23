@@ -9,11 +9,15 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'teacher_schedule_id', 'date', 'schedule', 'status'];
+    protected $fillable = ['user_id', 'teacher_schedule_id', 'date', 'status'];
 
     public function teacherSchedule()
     {
         return $this->belongsTo(TeacherSchedule::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
    
 }

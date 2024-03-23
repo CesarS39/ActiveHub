@@ -1,41 +1,37 @@
 @extends('adminlte::page')
 
-@section('title', 'Create Teacher Schedule')
+@section('title', 'Create Schedule')
 
 @section('content_header')
-    <h1>Create a New Teacher Schedule</h1>
+    <h2 class="text-center text-blue">Create Schedule</h2>
 @stop
 
 @section('content')
-<div class="card">
-    <div class="card-body">
-        <form action="{{ route('teacherSchedules.store') }}" method="POST">
-            @csrf
-            <div class="form-group">
-                <label for="user_id">Teacher:</label>
-                <select class="form-control" id="user_id" name="user_id" required>
-                    @foreach($teachers as $teacher)
-                        <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="sport_id">Sport:</label>
-                <select class="form-control" id="sport_id" name="sport_id" required>
-                    @foreach($sports as $sport)
-                        <option value="{{ $sport->id }}">{{ $sport->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="schedule">Schedule:</label>
-                <input type="time" class="form-control" id="schedule" name="schedule" required>
-            </div>
-            <button type="submit" class="btn btn-success">Create Schedule</button>
-            <a href="{{ route('teacherSchedules.index') }}" class="btn btn-secondary">Cancel</a>
-        </form>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('teacherSchedules.store') }}">
+                @csrf
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-blue" for="user_id">Select Teacher</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="user_id" name="user_id" required>
+                            @foreach($teachers as $teacher)
+                                <option value="{{ $teacher->id }}">{{ $teacher->name }} {{ $teacher->lastName }}</option>
+                            @endforeach
+                        </select>
+                        @error('user_id')
+                            <span class="text-danger">
+                                <span>*{{$message}}</span>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 @stop
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Bookings')
+@section('title', 'Reservas de Clases')
 
 @section('content_header')
-    <h2 class="text-center text-blue" >BOOKINGS</h2>
+    <h2 class="text-center text-blue">Reservas de Clases</h2>
 @stop
 
 @section('content')
@@ -22,72 +22,52 @@
     @endif
 
     <div class="card">
-        <div class="card-header container">
-            <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12">
-                    <a href="{{ route ('bookings.create')}}" class="btn btn-primary">Add Booking</a>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12">
-                    <form action="{{route('bookings.index')}}" method="GET">
-                        <div class="mb-3 row">
-                            <div class="col-sm-9">
-                                    <input type="text" name="filterValue" placeholder="Search by booking" class="form-control rounded border-primary text-secondary">
-                                </div>
-                                <div class="col="col-sm-3">
-                                    <button type="submit" class="btn btn-primary"><b>Search</b></button> 
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="card-header">
+            <a href="{{ route('bookings.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Nueva Reserva
+            </a>
         </div>
-
         <div class="card-body">
-            <table class="table table-striped sm" >
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th class="text-blue">ID</th>
-                        <th class="text-blue">Student ID</th>
-                        <th class="text-blue">Teacher Schedule ID</th>
-                        <th class="text-blue">Date</th>
-                        <th class="text-blue">Schedule</th>
-                        <th class="text-blue">Status</th>
-                        <th class="text-center text-blue" colspan="3">Actions</th>
+                        <th class="text-blue">Usuario</th>
+                        <th class="text-blue">Profesor</th>
+                        <th class="text-blue">Deporte</th>
+                        <th class="text-blue">Horario</th>
+                        <th class="text-center text-blue" colspan="2">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($bookings as $booking)
+                    @forelse ($bookings as $booking)
                         <tr>
-                            <td><b>{{ $booking->id }}</b></td>
-                            <td>{{ $booking->student_id }}</td>
-                            <td>{{ $booking->teacher_schedule_id }}</td>
-                            <td>{{ $booking->date }}</td>
-                            <td>{{ $booking->schedule }}</td>
-                            <td>{{ $booking->status }}</td>
+                            <td>{{ $booking->id }}</td>
+                            <td>{{ $booking->user->name }}</td>
+                            <td>{{ $booking->teacherSchedule->sport_user->user->name }}</td>
+                            <td>{{ $booking->teacherSchedule->sport_user->sport->name }}</td>
+                            <td>{{ $booking->teacherSchedule->schedule }}</td>
 
-                            <td width="2px">
-                                <a href="{{ route('bookings.show', $booking)}}" class="btn btn-primary btn-sm mb-2">Show</a>
+                            <td>
+                                <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-primary btn-sm">Editar</a>
                             </td>
-                            <td width="5px">
-                                <a href="{{ route('bookings.edit', $booking)}}" class="btn btn-primary btn-sm mb-2">Edit</a>
-                            </td>
-                            <td width="5px">
-                                <form action="{{ route('bookings.destroy', $booking)}}" method="POST">
+                            <td>
+                                <form action="{{ route('bookings.destroy', $booking) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <input type="submit" value="Delete" class="btn btn-danger btn-sm">
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">No hay reservas agendadas.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-
-            <div class="text-center mt-3">
-                {{ $bookings->links() }}
-            </div>
         </div>
-    </div>    
+    </div>
 @stop
 
 @section('css')

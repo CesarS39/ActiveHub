@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('teacher_schedules', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sport_user_id');
             $table->time('schedule');
+            $table->unsignedBigInteger('sport_user_id');
             $table->foreign('sport_user_id')->references('id')->on('sport_user')->onDelete('cascade');
             $table->timestamps();
         });

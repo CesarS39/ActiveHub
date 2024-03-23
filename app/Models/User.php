@@ -54,4 +54,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Sport::class);
     }
 
+    //relacion uno a muchos
+    public function bookings(){
+        return $this->hasMany('App\Models\Booking');
+    }
+
 }

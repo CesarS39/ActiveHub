@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('student_id');
-            $table->unsignedBigInteger('teacher_schedule_id');
             $table->date('date');
-            $table->time('schedule'); // Asegúrate de que este campo esté sincronizado con el horario en teacher_schedules
             $table->string('status')->default('scheduled'); // Por ejemplo: scheduled, completed, cancelled
             $table->timestamps();
 
-            $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('teacher_schedule_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('teacher_schedule_id')->references('id')->on('teacher_schedules')->onDelete('cascade');
         });
     }

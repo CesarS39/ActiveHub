@@ -65,9 +65,52 @@ Route::resource('teachers', TeacherController::class)->middleware('auth');
 
 //rutas para estudiantes
 Route::resource('students', StudentController::class)->middleware('auth');
-
 Route::resource('teacherSchedules', TeacherScheduleController::class)->middleware('auth');
 Route::resource('bookings', BookingController::class)->middleware('auth');
+Route::post('bookings/continue-to-sports', [BookingController::class, 'continueToSports'])->name('bookings.continueToSports');
+Route::post('bookings/continue-to-schedules', [BookingController::class, 'continueToSchedules'])->name('bookings.continueToSchedules');
+Route::post('bookings/store-final', [BookingController::class, 'storeFinal'])->name('bookings.storeFinal');
+Route::resource('bookings', BookingController::class)->except(['show'])->middleware('auth');
+Route::post('bookings/store-final', [BookingController::class, 'storeFinal'])->name('bookings.storeFinal');
+
+
+// Ruta para guardar la selección inicial del profesor y mostrar los deportes
+Route::post('/teacherSchedules/store', [TeacherScheduleController::class, 'store'])->name('teacherSchedules.store')->middleware('auth');
+
+// Ruta para guardar el horario final después de seleccionar deporte y hora
+Route::post('/teacherSchedules/storeSchedule', [TeacherScheduleController::class, 'storeSchedule'])->name('teacherSchedules.storeSchedule')->middleware('auth');
 
 
 require __DIR__.'/auth.php';
+
+//rutas vistas publicas
+Route::get('/pago', function () {
+    return view('todos.pago');
+});
+Route::get('/profesores', function () {
+    return view('todos.profesores');
+});
+Route::get('/tennis', function () {
+    return view('todos.tennis');
+});
+Route::get('/admin', function () {
+    return view('todos.administrador');
+});
+Route::get('/maestro', function () {
+    return view('todos.maestro');
+});
+Route::get('/alumno', function () {
+    return view('todos.alumno');
+});
+Route::get('/maestroTennis1', function () {
+    return view('todos.maestroTennis1');
+});
+Route::get('/carrito', function () {
+    return view('todos.carrito');
+});
+Route::get('/preguntas', function () {
+    return view('todos.preguntas');
+});
+Route::get('/maestro/tarjetas', function () {
+    return view('todos.maestroPerfil.tarjetasM');
+});

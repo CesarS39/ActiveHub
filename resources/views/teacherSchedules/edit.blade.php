@@ -7,38 +7,47 @@
 @stop
 
 @section('content')
-<div class="card">
-    <div class="card-body">
-        <form action="{{ route('teacherSchedules.update', $teacherSchedule->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="form-group">
-                <label for="user_id">Teacher:</label>
-                <select class="form-control" id="user_id" name="user_id" required>
-                    @foreach($teachers as $teacher)
-                        <option value="{{ $teacher->id }}" @if($teacher->id == $teacherSchedule->user_id) selected @endif>{{ $teacher->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="sport_id">Sport:</label>
-                <select class="form-control" id="sport_id" name="sport_id" required>
-                    @foreach($sports as $sport)
-                        <option value="{{ $sport->id }}" @if($sport->id == $teacherSchedule->sport_id) selected @endif>{{ $sport->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="schedule">Schedule:</label>
-                <input type="time" class="form-control" id="schedule" name="schedule" value="{{ $teacherSchedule->schedule }}" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Update Schedule</button>
-            <a href="{{ route('teacherSchedules.index') }}" class="btn btn-secondary">Cancel</a>
-        </form>
-    </div>
-</div>
-@stop
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('teacherSchedules.update', $schedule->id) }}">
+                @csrf
+                @method('PUT')
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-blue" for="schedule">Schedule Time</label>
+                    <div class="col-sm-10">
+                        <input type="time" class="form-control" id="schedule" name="schedule" value="{{ old('schedule', $schedule->schedule) }}" required>
+                        @error('schedule')
+                            <span class="text-danger">
+                                <span>*{{$message}}</span>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
 
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-blue" for="sport_user_id">Sport User</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="sport_user_id" name="sport_user_id" required>
+                            @foreach($sportUsers as $sportUser)
+                                <option value="{{ $sportUser->id }}" {{ $schedule->sport_user_id == $sportUser->id ? 'selected' : '' }}>{{ $sportUser->user->name }} - {{ $sportUser->sport->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('sport_user_id')
+                            <span class="text-danger">
+                                <span>*{{$message}}</span>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="submit" value="Update Schedule" class="btn btn-primary">
+                    <a href="{{ route('teacherSchedules.index') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+@stop
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
 @stop
